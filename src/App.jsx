@@ -1,28 +1,78 @@
 import React, {useState, useEffect} from "react";
+
 const App = () => {
+  const [productTitle,setProductTitle] = useState("")
+  const [productDescription,setProductDescription] = useState("")
+  const [productPrice,setProductPrice] = useState("")
+  const [productImage,setProductImage] = useState(null)
 
-  const [products, setProducts] = useState([])
+  const handleSubmit = async(e) => {
+     e.preventDefault()
 
-  useEffect(() => {
-    fetch("https://fakestoreapi.com/products")
-    .then(response => response.json())
-    .then(data => setProducts(data))
-  }, [])
-  console.log(products)
-  return (
-    <div>
-    <h1 className="font-medium text-2xl text-center mb-10 md:text-3xl lg:text-4xl">My Clothing Store</h1>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10">
-      {products.map(item => (
-      <div key={item.id} className="bg-white rounded-xl  border border-gray-400 shadow-md p-3 hover:shadow-lg transition">
-        <img src={item.image} className="w-30"/>
-        <h3 className="text-1xl font-medium mt-3 mb-4">{item.title}</h3>
-        <h5 className="text-sm">{item.description}</h5>
-        <p className="mt-2 font-bold">${item.price}</p>
+     const formData = new FormData()
+
+     formData.append("title",productTitle)
+     formData.append("description",productDescription)
+     formData.append("price",productPrice)
+     formData.append("image",productImage)
+
+     try {
+       const response = await fetch("https://fakestoreapi.com/products",{
+        method:"POST",
+        body:formData
         
-      </div>
-    ))}
-    </div>
+       })
+       const errorData = await response.json()
+       console.log("upload failed");
+
+       alert("error" + errorData.message)
+       
+       const result = await response.json()
+       console.log("product created", result);
+
+       alert("product created succesfully")
+       
+
+     } catch (error) {
+      console.log("error");
+      alert("failed to connect to the server")
+      
+     }
+  }
+
+  return(
+    <div className="">
+<div className="flex justify-center mt-20">
+       <form onSubmit={handleSubmit} className="p-10 w-[400px] h-[90vh] border-2 border-gray-300">
+      <h2 className="text-center text-3xl mb-10">upload product</h2>
+      <input type="text"
+      placeholder="enter product tile"
+      onChange={(e)=>setProductTitle(e.target.value)}
+      className="w-[300px] h-[45px] p-2 border-2 border-slate-400 rounded-lg mb-5 outline-none"
+      
+      />
+      <input type="text"
+      placeholder="enter product Description"
+      onChange={(e)=>setProductDescription(e.target.value)}
+      className="w-[300px] h-[45px] p-2 border-2 border-slate-400 rounded-lg mb-5 outline-none"
+      
+      />
+      <input type="text"
+      placeholder="enter product price"
+      onChange={(e)=>setProductPrice(e.target.value)}
+      className="w-[300px] h-[45px] p-2 border-2 border-slate-400 rounded-lg ouline-none mb-5"
+      
+      />
+      <input type="file"
+      placeholder="enter product image"
+      onChange={(e)=>setProductImage(e.target.files[0])}
+      className="w-[300px] h-[45px] p-2 border-2 border-slate-400 rounded-full ouline-none mb-5"
+      
+      />
+      
+      <button  type = "submit" className="w-[300px] h-[45px] bg-slate-800 border-none rounded-lg text-white cursor-pointer">upload product</button>
+     </form>
+</div>
     </div>
   )
 }
